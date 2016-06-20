@@ -9,11 +9,4 @@ func main() {
 	for i := 0; i < len(p); i++ {
 		fmt.Printf("p[%d] = %d\n", i, p[i])
 	}
-
-	a := []int{1, 2, 3, 4, 5}
-	fmt.Println(a)
-
-	for i := 0; i < len(a); i++ {
-		fmt.Printf("a[%d] = %d\n", i, a[i])
-	}
 }
