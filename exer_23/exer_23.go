@@ -5,9 +5,8 @@ import (
 	"math"
 )
 
-func Sqrt(x float64) (z, cnt float64) {
-	z = 1.0
-	cnt = 0
+func Sqrt(x float64) float64 {
+	z := 1.0
 
 	for {
 		pz := z
@@ -16,13 +15,11 @@ func Sqrt(x float64) (z, cnt float64) {
 		if math.Abs(pz-z) < 0.00000001 {
 			break
 		}
-
-		cnt++
 	}
 
-	return
+	return z
 }
 
 func main() {
-	fmt.Println(Sqrt(11235))
+	fmt.Println(Sqrt(2))
 }
