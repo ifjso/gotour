@@ -16,8 +16,9 @@ func main() {
 
 	a = f
 	a = &v
+	// a = v
 
-	fmt.Println(a)
+	fmt.Println(a.Abs())
 }
 
 type MyFloat float64
