@@ -6,12 +6,12 @@ import (
 )
 
 type MyError struct {
-	When time.Time
-	What string
+	when time.Time
+	what string
 }
 
 func (e *MyError) Error() string {
-	return fmt.Sprintf("at %v, %s", e.When, e.What)
+	return fmt.Sprintf("at %v %s", e.when, e.what)
 }
 
 func run() error {
@@ -25,6 +25,4 @@ func main() {
 	if err := run(); err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println(time.Now())
 }

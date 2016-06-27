@@ -6,18 +6,17 @@ import (
 )
 
 func Sqrt(x float64) float64 {
-	z := 1.0
+	z := x
 
 	for {
-		pz := z
-		z = z - (z*z-x)/(2*z)
+		nz := z - (z*z-x)/(2*z)
 
-		if math.Abs(pz-z) < 0.00000001 {
-			break
+		if math.Abs(nz-z) < 0.00000001 {
+			return nz
 		}
-	}
 
-	return z
+		z = nz
+	}
 }
 
 func main() {
