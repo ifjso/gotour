@@ -5,13 +5,15 @@ import (
 	"math"
 )
 
+const EPSILON = 0.00000001
+
 func Sqrt(x float64) float64 {
-	z := x
+	z := 1.0
 
 	for {
 		nz := z - (z*z-x)/(2*z)
 
-		if math.Abs(nz-z) < 0.00000001 {
+		if math.Abs(nz-z) < EPSILON {
 			return nz
 		}
 
