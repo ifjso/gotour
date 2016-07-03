@@ -6,22 +6,48 @@ type Fetcher interface {
 	Fetch(url string) (body string, urls []string, err error)
 }
 
+type fetchResult struct {
+	url, body string
+	urls      []string
+	depth     int
+	err       error
+}
+
 func Crawl(url string, depth int, fetcher Fetcher) {
 	if depth <= 0 {
 		return
 	}
 
-	body, urls, err := fetcher.Fetch(url)
-	if err != nil {
-		fmt.Println(err)
-		return
+	ch := make(chan *fetchResult)
+	fetched := make(map[string]bool)
+	fetch := func(url string, depth int) {
+		body, urls, err := fetcher.Fetch(url)
+		ch <- &fetchResult{url, body, urls, depth, err}
 	}
 
-	fmt.Printf("found: %s %q\n", url, body)
-	for _, u := range urls {
-		Crawl(u, depth-1, fetcher)
+	go fetch(url, depth)
+	fetched[url] = true
+
+	for i := 1; i > 0; i-- {
+		res := <-ch
+
+		if res.err != nil {
+			fmt.Println(res.err)
+			continue
+		}
+
+		fmt.Printf("found: %s %q\n", res.url, res.body)
+
+		if res.depth > 1 {
+			for _, u := range res.urls {
+				if !fetched[u] {
+					go fetch(u, res.depth-1)
+					fetched[u] = true
+					i++
+				}
+			}
+		}
 	}
-	return
 }
 
 func main() {
@@ -39,6 +65,7 @@ func (f *fakeFetcher) Fetch(url string) (string, []string, error) {
 	if res, ok := (*f)[url]; ok {
 		return res.body, res.urls, nil
 	}
+
 	return "", nil, fmt.Errorf("not found: %s", url)
 }
 
