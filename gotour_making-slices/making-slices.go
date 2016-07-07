@@ -9,7 +9,7 @@ func main() {
 	b := make([]int, 0, 5)
 	printSlice("b", b)
 
-	c := b[:5]
+	c := b[:2]
 	printSlice("c", c)
 
 	d := c[2:5]
