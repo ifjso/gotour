@@ -7,14 +7,13 @@ import (
 )
 
 func WordCount(s string) map[string]int {
-	r := make(map[string]int)
-	sp := strings.Fields(s)
-
-	for _, v := range sp {
-		r[v]++
+	m := make(map[string]int)
+	words := strings.Fields(s)
+	for _, v := range words {
+		m[v]++
 	}
 
-	return r
+	return m
 }
 
 func main() {

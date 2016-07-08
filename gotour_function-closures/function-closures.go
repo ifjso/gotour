@@ -12,11 +12,10 @@ func adder() func(int) int {
 
 func main() {
 	pos, neg := adder(), adder()
-
 	for i := 0; i < 10; i++ {
 		fmt.Println(
 			pos(i),
-			neg(-i*2),
+			neg(-2*i),
 		)
 	}
 }
