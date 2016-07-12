@@ -1,18 +1,9 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Fetcher interface {
 	Fetch(url string) (body string, urls []string, err error)
-}
-
-type fetchResult struct {
-	url, body string
-	urls      []string
-	depth     int
-	err       error
 }
 
 func Crawl(url string, depth int, fetcher Fetcher) {
@@ -20,34 +11,40 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 		return
 	}
 
-	ch := make(chan *fetchResult)
-	fetched := make(map[string]bool)
-	fnFetch := func(url string, depth int) {
+	fetched := map[string]bool{url: true}
+	urls := []string{url}
+	ch := make(chan []string)
+	fnCrawl := func(url string) {
 		body, urls, err := fetcher.Fetch(url)
-		ch <- &fetchResult{url, body, urls, depth, err}
-	}
 
-	go fnFetch(url, depth)
-	fetched[url] = true
-
-	for i := 1; i > 0; i-- {
-		res := <-ch
-		if res.err != nil {
-			fmt.Println(res.err)
-			continue
+		if err != nil {
+			fmt.Println(err)
+			ch <- []string{}
+			return
 		}
 
-		fmt.Printf("found: %s %q\n", res.url, res.body)
+		fmt.Printf("found: %s %q\n", url, body)
 
-		if res.depth > 1 {
-			for _, u := range res.urls {
+		ch <- urls
+	}
+
+	for i := 0; i < depth; i++ {
+		var next []string
+		for _, u := range urls {
+			go fnCrawl(u)
+		}
+
+		for _ = range urls {
+			res := <-ch
+			for _, u := range res {
 				if !fetched[u] {
-					go fnFetch(u, res.depth-1)
 					fetched[u] = true
-					i++
+					next = append(next, u)
 				}
 			}
 		}
+
+		urls = next
 	}
 }
 
