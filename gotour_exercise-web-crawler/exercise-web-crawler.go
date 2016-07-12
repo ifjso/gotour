@@ -16,7 +16,6 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 	ch := make(chan []string)
 	fnCrawl := func(url string) {
 		body, urls, err := fetcher.Fetch(url)
-
 		if err != nil {
 			fmt.Println(err)
 			ch <- []string{}
@@ -30,16 +29,17 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 
 	for i := 0; i < depth; i++ {
 		var next []string
+
 		for _, u := range urls {
 			go fnCrawl(u)
 		}
 
-		for _ = range urls {
+		for j := 0; j < len(urls); j++ {
 			res := <-ch
-			for _, u := range res {
-				if !fetched[u] {
-					fetched[u] = true
-					next = append(next, u)
+			for _, r := range res {
+				if !fetched[r] {
+					fetched[r] = true
+					next = append(next, r)
 				}
 			}
 		}
