@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Fetcher interface {
 	Fetch(url string) (body string, urls []string, err error)
@@ -19,16 +17,42 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 	if depth <= 0 {
 		return
 	}
-	body, urls, err := fetcher.Fetch(url)
-	if err != nil {
-		fmt.Println(err)
-		return
+
+	fetched := map[string]bool{url: true}
+	urls := []string{url}
+	ch := make(chan []string)
+	fnCrawl := func(url string) {
+		body, urls, err := fetcher.Fetch(url)
+		if err != nil {
+			fmt.Println(err)
+			ch <- []string{}
+			return
+		}
+
+		fmt.Printf("found: %s %q\n", url, body)
+
+		ch <- urls
 	}
-	fmt.Printf("found: %s %q\n", url, body)
-	for _, u := range urls {
-		Crawl(u, depth-1, fetcher)
+
+	for i := 0; i < depth; i++ {
+		var next []string
+
+		for _, u := range urls {
+			go fnCrawl(u)
+		}
+
+		for j := 0; j < len(urls); j++ {
+			res := <-ch
+			for _, r := range res {
+				if !fetched[r] {
+					fetched[r] = true
+					next = append(next, r)
+				}
+			}
+		}
+
+		urls = next
 	}
-	return
 }
 
 func main() {
