@@ -8,6 +8,13 @@ type Fetcher interface {
 	Fetch(url string) (body string, urls []string, err error)
 }
 
+type fetchResult struct {
+	url, body string
+	urls      []string
+	err       error
+	depth     int
+}
+
 func Crawl(url string, depth int, fetcher Fetcher) {
 	if depth <= 0 {
 		return
