@@ -68,6 +68,7 @@ type fakeResult struct {
 
 func (f fakeFetcher) Fetch(url string) (string, []string, error) {
 	if res, ok := f[url]; ok {
+
 		return res.body, res.urls, nil
 	}
 	return "", nil, fmt.Errorf("not found: %s", url)
